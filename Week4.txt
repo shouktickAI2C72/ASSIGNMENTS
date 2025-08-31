@@ -1,0 +1,179 @@
+// ===============================
+// Linked List Assignment Solutions
+// ===============================
+
+/*--------------------------------
+#1. Insert at beginning DLL
+--------------------------------*/
+Node* insertInSortedDLL(Node* head, int x) {
+    Node* newNode = new Node(x);
+    if (!head) return newNode;
+    if (x < head->data) {
+        newNode->next = head;
+        head->prev = newNode;
+        return newNode;
+    }
+    Node* curr = head;
+    while (curr->next && curr->next->data < x)
+        curr = curr->next;
+    newNode->next = curr->next;
+    if (curr->next) curr->next->prev = newNode;
+    curr->next = newNode;
+    newNode->prev = curr;
+    return head;
+}
+
+/*--------------------------------
+#2. Delete node DLL
+--------------------------------*/
+Node* deleteNode(Node* head, int x) {
+    if (!head) return NULL;
+    if (x == 1) {
+        Node* temp = head;
+        head = head->next;
+        if (head) head->prev = NULL;
+        delete temp;
+        return head;
+    }
+    Node* curr = head;
+    for (int i = 1; curr && i < x; i++) curr = curr->next;
+    if (!curr) return head;
+    if (curr->prev) curr->prev->next = curr->next;
+    if (curr->next) curr->next->prev = curr->prev;
+    delete curr;
+    return head;
+}
+
+/*--------------------------------
+#3. Reverse a DLL
+--------------------------------*/
+Node* reverseDLL(Node* head) {
+    Node* temp = NULL;
+    Node* curr = head;
+    while (curr) {
+        temp = curr->prev;
+        curr->prev = curr->next;
+        curr->next = temp;
+        curr = curr->prev;
+    }
+    if (temp) head = temp->prev;
+    return head;
+}
+
+/*--------------------------------
+#4. Insert in circular linked list
+--------------------------------*/
+Node* insert(Node* head, int data) {
+    Node* newNode = new Node(data);
+    if (!head) {
+        newNode->next = newNode;
+        return newNode;
+    }
+    Node* curr = head;
+    while (curr->next != head) curr = curr->next;
+    curr->next = newNode;
+    newNode->next = head;
+    return head;
+}
+
+/*--------------------------------
+#5. Josephus Problem
+--------------------------------*/
+int josephus(int n, int k) {
+    if (n == 1) return 1;
+    return (josephus(n - 1, k) + k - 1) % n + 1;
+}
+
+/*--------------------------------
+#6. Sorted insert in CLL
+--------------------------------*/
+Node* sortedInsert(Node* head, int data) {
+    Node* newNode = new Node(data);
+    if (!head) {
+        newNode->next = newNode;
+        return newNode;
+    }
+    Node* curr = head;
+    if (data <= head->data) {
+        while (curr->next != head) curr = curr->next;
+        curr->next = newNode;
+        newNode->next = head;
+        return newNode;
+    }
+    while (curr->next != head && curr->next->data < data) curr = curr->next;
+    newNode->next = curr->next;
+    curr->next = newNode;
+    return head;
+}
+
+/*--------------------------------
+#7. Check if linked list is circular
+--------------------------------*/
+bool isCircular(Node* head) {
+    if (!head) return true;
+    Node* curr = head->next;
+    while (curr && curr != head) curr = curr->next;
+    return (curr == head);
+}
+
+/*--------------------------------
+#8. Pairwise swap nodes
+--------------------------------*/
+Node* pairwiseSwap(Node* head) {
+    if (!head || !head->next) return head;
+    Node* curr = head->next->next;
+    Node* prev = head;
+    head = head->next;
+    head->next = prev;
+    while (curr && curr->next) {
+        prev->next = curr->next;
+        prev = curr;
+        Node* next = curr->next->next;
+        curr->next->next = curr;
+        curr = next;
+    }
+    prev->next = curr;
+    return head;
+}
+
+/*--------------------------------
+#9. Intersection point in Y shaped linked list
+--------------------------------*/
+int intersectPoint(Node* head1, Node* head2) {
+    int len1 = 0, len2 = 0;
+    Node* a = head1, *b = head2;
+    while (a) { len1++; a = a->next; }
+    while (b) { len2++; b = b->next; }
+    a = head1; b = head2;
+    if (len1 > len2) {
+        for (int i = 0; i < len1 - len2; i++) a = a->next;
+    } else {
+        for (int i = 0; i < len2 - len1; i++) b = b->next;
+    }
+    while (a && b) {
+        if (a == b) return a->data;
+        a = a->next; b = b->next;
+    }
+    return -1;
+}
+
+/*--------------------------------
+#10. Flatten multi-level linked list
+--------------------------------*/
+Node* merge(Node* a, Node* b) {
+    if (!a) return b;
+    if (!b) return a;
+    if (a->data < b->data) {
+        a->bottom = merge(a->bottom, b);
+        return a;
+    } else {
+        b->bottom = merge(a, b->bottom);
+        return b;
+    }
+}
+Node* flatten(Node* root) {
+    if (!root || !root->next) return root;
+    root->next = flatten(root->next);
+    root = merge(root, root->next);
+    return root;
+}
