@@ -1,0 +1,188 @@
+# ===============================
+# Stack Assignment Solutions (Python)
+# ===============================
+
+#--------------------------------
+#1. Implement stack using array
+#--------------------------------
+class StackArray:
+    def __init__(self):
+        self.stack = []
+    def push(self, x):
+        self.stack.append(x)
+    def pop(self):
+        if not self.stack:
+            return -1
+        return self.stack.pop()
+    def peek(self):
+        if not self.stack:
+            return -1
+        return self.stack[-1]
+    def isEmpty(self):
+        return len(self.stack) == 0
+
+#--------------------------------
+#2. Implement stack using linked list
+#--------------------------------
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+class StackLinkedList:
+    def __init__(self):
+        self.head = None
+    def push(self, x):
+        newNode = Node(x)
+        newNode.next = self.head
+        self.head = newNode
+    def pop(self):
+        if not self.head:
+            return -1
+        val = self.head.data
+        self.head = self.head.next
+        return val
+    def peek(self):
+        if not self.head:
+            return -1
+        return self.head.data
+    def isEmpty(self):
+        return self.head is None
+
+#--------------------------------
+#3. Balanced parentheses check
+#--------------------------------
+def isBalanced(s):
+    stack = []
+    mapping = {')':'(', '}':'{', ']':'['}
+    for ch in s:
+        if ch in mapping.values():
+            stack.append(ch)
+        elif ch in mapping:
+            if not stack or stack[-1] != mapping[ch]:
+                return "NO"
+            stack.pop()
+    return "YES" if not stack else "NO"
+
+#--------------------------------
+#4. Infix to postfix
+#--------------------------------
+def infixToPostfix(exp):
+    prec = {'^':3, '*':2, '/':2, '+':1, '-':1}
+    stack, result = [], ""
+    for ch in exp:
+        if ch.isalnum():
+            result += ch
+        elif ch == '(':
+            stack.append(ch)
+        elif ch == ')':
+            while stack and stack[-1] != '(':
+                result += stack.pop()
+            stack.pop()
+        else:
+            while stack and stack[-1] != '(' and prec.get(stack[-1],0) >= prec.get(ch,0):
+                result += stack.pop()
+            stack.append(ch)
+    while stack:
+        result += stack.pop()
+    return result
+
+#--------------------------------
+#5. Evaluate postfix expression
+#--------------------------------
+def evaluatePostfix(exp):
+    stack = []
+    for ch in exp:
+        if ch.isdigit():
+            stack.append(int(ch))
+        else:
+            b = stack.pop()
+            a = stack.pop()
+            if ch == '+': stack.append(a+b)
+            elif ch == '-': stack.append(a-b)
+            elif ch == '*': stack.append(a*b)
+            elif ch == '/': stack.append(int(a/b))
+    return stack[-1]
+
+#--------------------------------
+#6. Stock span problem
+#--------------------------------
+def calculateSpan(price, n):
+    stack, res = [], [0]*n
+    for i in range(n):
+        while stack and price[stack[-1]] <= price[i]:
+            stack.pop()
+        res[i] = i+1 if not stack else i-stack[-1]
+        stack.append(i)
+    return res
+
+#--------------------------------
+#7. Next greater element
+#--------------------------------
+def nextLargerElement(arr, n):
+    res, stack = [-1]*n, []
+    for i in range(n-1,-1,-1):
+        while stack and stack[-1] <= arr[i]:
+            stack.pop()
+        if stack:
+            res[i] = stack[-1]
+        stack.append(arr[i])
+    return res
+
+#--------------------------------
+#8. Celebrity problem
+#--------------------------------
+def celebrity(M, n):
+    stack = list(range(n))
+    while len(stack) > 1:
+        a = stack.pop()
+        b = stack.pop()
+        if M[a][b] == 1:
+            stack.append(b)
+        else:
+            stack.append(a)
+    cand = stack[0]
+    for i in range(n):
+        if i != cand and (M[cand][i] == 1 or M[i][cand] == 0):
+            return -1
+    return cand
+
+#--------------------------------
+#9. Minimum bracket reversal
+#--------------------------------
+def countRev(s):
+    if len(s)%2: return -1
+    stack = []
+    for ch in s:
+        if ch == '{':
+            stack.append(ch)
+        else:
+            if stack and stack[-1] == '{':
+                stack.pop()
+            else:
+                stack.append(ch)
+    m = len(stack)
+    n = stack.count('{')
+    return (m//2 + n%2)
+
+#--------------------------------
+#10. Hackerrank: Simple text editor
+#--------------------------------
+def simpleTextEditor(operations):
+    s = ""
+    history = []
+    output = []
+    for op in operations:
+        parts = op.split()
+        if parts[0] == "1":
+            history.append(s)
+            s += parts[1]
+        elif parts[0] == "2":
+            history.append(s)
+            k = int(parts[1])
+            s = s[:-k]
+        elif parts[0] == "3":
+            k = int(parts[1])
+            output.append(s[k-1])
+        elif parts[0] == "4":
+            s = history.pop()
+    return output
